@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Freak — Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    window.addEventListener("backendSyncComplete", () => {
+      console.log("[Sync] Data updated from server. Reloading to refresh dashboard...");
+      window.location.reload();
+    });
+  </script>
+</head>
+<body>
+
+<!-- ANIMATED BACKGROUND -->
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<canvas id="particles"></canvas>
+
+<!-- NAV -->
+<nav class="nav-glass" id="navbar">
+  <div class="nav-inner">
+    <div class="nav-mode">
+  <button onclick="setMode('beginner')" class="nav-btn-ghost">Beginner</button>
+  <button onclick="setMode('intermediate')" class="nav-btn-ghost">Intermediate</button>
+  <button onclick="setMode('expert')" class="nav-btn-ghost">Expert</button>
+</div>
+      <div class="nav-brand">
+        <div class="logo-pulse"><span>💪</span></div>
+        <h1 class="brand-text">Fitness Freak</h1>
+      </div>
+    <div class="nav-right">
+      <span id="nav-greeting" class="nav-greeting">Welcome, Athlete</span>
+      <button onclick="resetProfile()" class="nav-btn-ghost">Reset Profile</button>
+      <button onclick="logout()" class="nav-btn-danger">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero reveal" id="hero">
+  <div class="hero-content">
+    <div class="hero-badge">🔥 Your personalized dashboard is ready</div>
+    <h1 class="hero-title">
+      Welcome back, <span class="text-glow" id="hero-name">Athlete</span>
+    </h1>
+    <p class="hero-sub" id="hero-sub">AI-powered posture tracking • Personalized workouts • Custom diet plans</p>
+    <div class="hero-actions">
+      <button onclick="openAI()" class="btn-primary">
+        <span class="btn-shine"></span>
+        🤖 Launch AI Trainer
+      </button>
+      <a href="nutrition.html" class="btn-outline">🍎 Nutrition Scanner</a>
+      <a href="tracker.html" class="btn-outline">🏋️ Workout Tracker</a>
+      <a href="#workouts" class="btn-outline">View Workout Plan ↓</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card-stack">
+      <div class="floating-stat stat-1 reveal-delay-1">
+        <span class="stat-icon">🏋️</span>
+        <div><span class="stat-num" id="stat-body">Lean Fit</span><span class="stat-label">Body Goal</span></div>
+      </div>
+      <div class="floating-stat stat-2 reveal-delay-2">
+        <span class="stat-icon">🎯</span>
+        <div><span class="stat-num" id="stat-goal">Gain</span><span class="stat-label">Target</span></div>
+      </div>
+      <div class="floating-stat stat-3 reveal-delay-3">
+        <span class="stat-icon">⚖️</span>
+        <div><span class="stat-num" id="stat-weight">-- kg</span><span class="stat-label">Weight</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROFILE STATS BAR -->
+<section class="stats-bar reveal">
+  <div class="stats-inner">
+    <div class="stat-pill"><span class="pill-label">Name</span><span class="pill-val" id="p-name">--</span></div>
+    <div class="stat-pill"><span class="pill-label">Age</span><span class="pill-val" id="p-age">--</span></div>
+    <div class="stat-pill"><span class="pill-label">Current Weight</span><span class="pill-val" id="p-weight">--</span></div>
+    <div class="stat-pill"><span class="pill-label">Target Weight</span><span class="pill-val accent-purple" id="p-target-weight">--</span></div>
+    <div class="stat-pill"><span class="pill-label">Goal</span><span class="pill-val accent-green" id="p-goal">--</span></div>
+    <div class="stat-pill"><span class="pill-label">Body Type</span><span class="pill-val" id="p-body">--</span></div>
+  </div>
+</section>
+
+<!-- AI COGNITIVE PROFILE -->
+<section class="ai-profile-section reveal" id="ai-profile-panel">
+  <div class="ai-profile-inner">
+    <div class="ai-profile-header">
+      <h2 class="ai-profile-title">🧠 Thawman AI Coach's Mind</h2>
+      <div class="ai-profile-sync"><span class="sync-dot"></span> AI Sync Active</div>
+    </div>
+    <div class="ai-profile-grid">
+      <div class="profile-card-dynamic">
+        <span class="profile-card-icon">💸</span>
+        <div class="profile-card-text">
+          <div class="profile-card-label">Budget Tier</div>
+          <div class="profile-card-val" id="p-budget">⚖️ Balanced (Standard)</div>
+        </div>
+      </div>
+      <div class="profile-card-dynamic">
+        <span class="profile-card-icon">🥦</span>
+        <div class="profile-card-text">
+          <div class="profile-card-label">Dietary Style</div>
+          <div class="profile-card-val" id="p-diet">🍗 Non-Vegetarian</div>
+        </div>
+      </div>
+      <div class="profile-card-dynamic">
+        <span class="profile-card-icon">🌶️</span>
+        <div class="profile-card-text">
+          <div class="profile-card-label">Taste Profile</div>
+          <div class="profile-card-val" id="p-taste">🥑 Clean Fit</div>
+        </div>
+      </div>
+      <div class="profile-card-dynamic">
+        <span class="profile-card-icon">⚡</span>
+        <div class="profile-card-text">
+          <div class="profile-card-label">Active Vibe</div>
+          <div class="profile-card-val" id="p-vibe">⚡ Standard Vibe</div>
+        </div>
+      </div>
+    </div>
+    <p class="ai-profile-hint">💬 <em>Try chatting with Thawman AI Coach: "I'm on a student budget", "make my diet vegetarian", "I love spicy Indian food", or "activate beast mode!" and watch the page evolve.</em></p>
+  </div>
+</section>
+
+<!-- DAILY GOALS -->
+<section class="goals-section reveal" id="daily-goals">
+  <div class="goals-header">
+    <h2 class="goals-title">📊 Today's Goals</h2>
+    <span class="goals-date" id="goals-date"></span>
+  </div>
+
+  <!-- STREAK & MOTIVATION BANNER -->
+  <div class="streak-banner" id="streak-banner">
+    <div class="streak-badge">
+      <span class="streak-fire">🔥</span>
+      <div>
+        <div class="streak-days-container"><span id="streak-days">0</span> Days</div>
+        <div class="streak-lbl">Active Streak</div>
+      </div>
+    </div>
+    <div class="streak-motivation">
+      <div class="motivation-title" id="motivation-title">🔥 DISCIPLINE MODE ACTIVE</div>
+      <p class="motivation-quote" id="motivation-quote">"Your potential is endless. Go do hard things."</p>
+    </div>
+  </div>
+
+  <div class="goals-grid">
+    <!-- CALORIES -->
+    <div class="goal-card">
+      <div class="goal-top">
+        <span class="goal-icon">🔥</span>
+        <div><div class="goal-label">Calories</div><div class="goal-nums"><span id="cal-eaten">0</span> / <span id="cal-target">2500</span> kcal</div></div>
+      </div>
+      <div class="goal-bar"><div class="goal-bar-fill bar-cal" id="cal-bar" style="width:0%"></div></div>
+      <div class="goal-remain" id="cal-remain">2500 kcal remaining</div>
+    </div>
+    <!-- PROTEIN -->
+    <div class="goal-card">
+      <div class="goal-top">
+        <span class="goal-icon">🥩</span>
+        <div><div class="goal-label">Protein</div><div class="goal-nums"><span id="pro-eaten">0</span> / <span id="pro-target">150</span> g</div></div>
+      </div>
+      <div class="goal-bar"><div class="goal-bar-fill bar-pro" id="pro-bar" style="width:0%"></div></div>
+      <div class="goal-remain" id="pro-remain">150g remaining</div>
+    </div>
+    <!-- WATER -->
+    <div class="goal-card">
+      <div class="goal-top">
+        <span class="goal-icon">💧</span>
+        <div><div class="goal-label">Water</div><div class="goal-nums"><span id="water-done">0</span> / <span id="water-target">8</span> glasses</div></div>
+      </div>
+      <div class="goal-bar"><div class="goal-bar-fill bar-water" id="water-bar" style="width:0%"></div></div>
+      <div class="water-btns">
+        <button class="water-btn" onclick="addWater()">+ 1 Glass (250ml)</button>
+        <button class="water-btn-reset" onclick="resetWater()">Reset</button>
+      </div>
+    </div>
+    <!-- BURNED -->
+    <div class="goal-card">
+      <div class="goal-top">
+        <span class="goal-icon">⚡</span>
+        <div><div class="goal-label">Calories Burned</div><div class="goal-nums"><span id="cal-burned">0</span> kcal</div></div>
+      </div>
+      <div class="goal-bar"><div class="goal-bar-fill bar-burn" id="burn-bar" style="width:0%"></div></div>
+      <div class="goal-remain" id="burn-detail">From today's workout sessions</div>
+    </div>
+  </div>
+  <!-- AI SUGGESTION -->
+  <div class="suggestion-card" id="suggestion-card" style="display:none">
+    <div class="sug-header">🤖 <strong>Thawman AI Coach Suggests:</strong></div>
+    <div class="sug-body" id="sug-body"></div>
+  </div>
+</section>
+
+<!-- GROWTH & PROGRESS SECTION -->
+<section class="progress-section reveal" id="growth-progress">
+  <div class="progress-header">
+    <div class="progress-title-container">
+      <span class="section-chip">📈 Analytics</span>
+      <h2 class="goals-title">Growth & Progress</h2>
+    </div>
+    <div class="progress-controls">
+      <!-- Chart Toggle Tabs -->
+      <div class="chart-tabs">
+        <button id="tab-chart-weight" onclick="switchChartType('weight')" class="chart-tab-btn active">Weight Progress</button>
+        <!-- <button id="tab-chart-calories" onclick="switchChartType('calories')" class="chart-tab-btn">Calories & Energy</button> -->
+      </div>
+      <!-- Timeframe Tabs -->
+      <div class="timeframe-tabs">
+        <button id="tab-tf-week" onclick="switchTimeframe('week')" class="chart-tab-btn active">Weekly</button>
+        <button id="tab-tf-month" onclick="switchTimeframe('month')" class="chart-tab-btn">Monthly</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-grid">
+    <!-- Chart Card -->
+    <div class="chart-card-container">
+      <div class="chart-wrapper">
+        <canvas id="growthChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Stats & Logging Panel -->
+    <div class="stats-panel">
+      <!-- Weight Log Form -->
+      <div class="panel-card log-weight-card">
+        <h3 class="panel-card-title">⚖️ Log Weight</h3>
+        <p class="panel-card-desc">Track your daily weight to update your growth profile.</p>
+        <div class="weight-input-group">
+          <input type="number" id="input-log-weight" step="0.1" min="10" max="250" placeholder="e.g. 70.5" class="weight-input">
+          <span class="weight-unit-lbl">kg</span>
+          <button onclick="submitWeightLog()" class="weight-btn-submit">Update</button>
+        </div>
+        <div class="progress-bar-container" id="goal-progress-bar-wrapper">
+          <div class="progress-bar-header">
+            <span id="goal-progress-lbl">Goal Progress</span>
+            <span id="goal-progress-pct" class="text-glow">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="goal-progress-fill" class="progress-bar-fill-glow" style="width: 0%"></div>
+          </div>
+          <span id="goal-progress-desc" class="progress-bar-desc">Log your weight to calculate progress.</span>
+        </div>
+      </div>
+
+      <!-- Stats Summary -->
+      <div class="panel-card stats-summary-card">
+        <h3 class="panel-card-title">⚡ Analytics Summary</h3>
+        <div class="mini-stats-grid">
+          <div class="mini-stat">
+            <span class="mini-stat-lbl">Average Weight</span>
+            <span class="mini-stat-val" id="stat-avg-weight">-- kg</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat-lbl" id="stat-lbl-weight-change">Total Change</span>
+            <span class="mini-stat-val accent-green" id="stat-total-weight-change">-- kg</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat-lbl">Avg Daily Calories</span>
+            <span class="mini-stat-val" id="stat-avg-calories">-- kcal</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat-lbl">Avg Daily Burned</span>
+            <span class="mini-stat-val accent-purple" id="stat-avg-burned">-- kcal</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI TRAINER BANNER -->
+<section class="ai-banner reveal" id="ai-section">
+  <div class="ai-banner-inner">
+    <div class="ai-left">
+      <span class="ai-chip">⚡ Real-Time AI</span>
+      <h2 class="ai-title">Posture Correction Trainer</h2>
+      <p class="ai-desc">Open your camera and get instant feedback on your form. Our AI tracks 33 body joints in real-time to ensure perfect posture on every rep.</p>
+      <button onclick="openAI()" class="btn-primary">Start Camera Session →</button>
+    </div>
+    <div class="ai-right">
+      <div class="ai-mockup">
+        <div class="mockup-screen">
+          <div class="skeleton-line w80"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-figure">
+              <div class="joint j1"></div><div class="joint j2"></div><div class="joint j3"></div>
+              <div class="joint j4"></div><div class="joint j5"></div>
+              <div class="bone b1"></div><div class="bone b2"></div><div class="bone b3"></div><div class="bone b4"></div>
+            </div>
+          </div>
+          <div class="skeleton-line w60"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKOUT PLANS -->
+<section class="section" id="workouts">
+  <div class="section-header reveal">
+    <span class="section-chip">🏋️ Training</span>
+    <h2 class="section-title" id="workout-title">Your Workout Plan</h2>
+    <p class="section-sub">Tailored exercises based on your profile and goals</p>
+  </div>
+  <div class="cards-grid" id="workout-container"></div>
+</section>
+
+<!-- DIET PLANS -->
+<section class="section" id="diet">
+  <div class="section-header reveal">
+    <span class="section-chip">🥗 Nutrition</span>
+    <h2 class="section-title" id="diet-title">Your Nutrition Guide</h2>
+    <p class="section-sub">Macro-optimized meals to fuel your progress</p>
+  </div>
+  <div class="cards-grid" id="diet-container"></div>
+</section>
+
+<!-- AI CHATBOT WIDGET -->
+<div id="chat-toggle" onclick="toggleChat()">
+  <span class="chat-toggle-icon" id="chat-icon">🤖</span>
+  <span class="chat-toggle-pulse"></span>
+</div>
+
+<div id="chat-panel" class="chat-hidden">
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="chat-avatar">🧠</div>
+      <div>
+        <div class="chat-bot-name">Thawman AI Coach</div>
+        <div class="chat-bot-status"><span class="status-dot"></span> Online — your fitness coach</div>
+      </div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+
+  <div class="chat-messages" id="chat-messages"></div>
+
+  <div class="chat-suggestions" id="chat-suggestions">
+    <button class="chip" onclick="sendChip(this)">What should I eat today?</button>
+    <button class="chip" onclick="sendChip(this)">I'm on a student budget 💸</button>
+    <button class="chip" onclick="sendChip(this)">Make my diet Vegetarian 🥦</button>
+    <button class="chip" onclick="sendChip(this)">Activate Beast Mode! 🔥</button>
+  </div>
+
+  <div class="chat-input-bar">
+    <input type="text" id="chat-input" placeholder="Ask me anything about fitness..." onkeydown="if(event.key==='Enter')sendMsg()">
+    <button class="chat-send" onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <p>© 2026 <strong>Fitness Freak</strong> — Built for smarter home workouts 💚</p>
+  </div>
+</footer>
+
+<script>
+function resetProfile() {
+  // Clear user data and reload the page to start fresh
+  localStorage.clear();
+  location.reload();
+}
+
+function logout() {
+  // Remove authentication token and redirect to login page
+  localStorage.removeItem('user');
+  window.location.href = 'login.html';
+}
+</script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible')); if (typeof window.updateDashboardDynamic === 'function') { window.updateDashboardDynamic(); } });
+</script>
+<script src="dashboard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="goals.js"></script>
+<script src="chatbot.js"></script>
+<script>
+  if (typeof window.updateDashboardDynamic === 'function') {
+    window.updateDashboardDynamic();
+  }
+</script>
+</body>
+</html>

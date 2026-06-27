@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thawman Fitness — Workout Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tracker.css">
+  <script src="api.js"></script>
+  <script>
+    window.addEventListener("backendSyncComplete", () => {
+      console.log("[Sync] History updated. Reloading tracker...");
+      window.location.reload();
+    });
+  </script>
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="index.html" class="back-link">← Dashboard</a>
+    <h1 class="nav-title">🏋️ Workout Tracker</h1>
+    <button class="finish-btn" id="finish-btn" onclick="finishSession()" style="display:none">✅ Finish Session</button>
+  </div>
+</nav>
+
+<!-- REST TIMER OVERLAY -->
+<div class="timer-overlay" id="timer-overlay">
+  <div class="timer-card">
+    <h3 class="timer-heading">Rest Timer</h3>
+    <div class="timer-ring">
+      <svg viewBox="0 0 200 200">
+        <circle class="timer-bg" cx="100" cy="100" r="88"/>
+        <circle class="timer-fill" cx="100" cy="100" r="88" id="timer-ring-fill"/>
+      </svg>
+      <div class="timer-display" id="timer-display">60</div>
+    </div>
+    <div class="timer-presets">
+      <button class="preset" onclick="setTimer(30)">30s</button>
+      <button class="preset active-preset" onclick="setTimer(60)">60s</button>
+      <button class="preset" onclick="setTimer(90)">90s</button>
+      <button class="preset" onclick="setTimer(120)">2m</button>
+    </div>
+    <div class="timer-actions">
+      <button class="timer-btn-start" onclick="startTimer()" id="btn-timer-start">▶ Start</button>
+      <button class="timer-btn-skip" onclick="skipTimer()">Skip Rest →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main-content">
+
+  <!-- ADD EXERCISE -->
+  <section class="add-section">
+    <h2 class="section-heading">Add Exercise</h2>
+    <div class="add-form">
+      <input type="text" id="ex-name" placeholder="Exercise name (e.g. Bench Press)" class="form-input">
+      <div class="add-row">
+        <input type="number" id="ex-sets" placeholder="Sets" class="form-input small" min="1">
+        <input type="number" id="ex-reps" placeholder="Reps" class="form-input small" min="1">
+        <input type="number" id="ex-weight" placeholder="Weight (kg)" class="form-input small" min="0" step="0.5">
+      </div>
+      <button class="add-btn" onclick="addExercise()">+ Add Exercise</button>
+    </div>
+    <!-- Quick add presets -->
+    <div class="quick-exercises">
+      <span class="qex" onclick="quickAdd('Bench Press')">Bench Press</span>
+      <span class="qex" onclick="quickAdd('Squats')">Squats</span>
+      <span class="qex" onclick="quickAdd('Deadlift')">Deadlift</span>
+      <span class="qex" onclick="quickAdd('Pull-ups')">Pull-ups</span>
+      <span class="qex" onclick="quickAdd('Shoulder Press')">Shoulder Press</span>
+      <span class="qex" onclick="quickAdd('Barbell Rows')">Barbell Rows</span>
+      <span class="qex" onclick="quickAdd('Bicep Curls')">Bicep Curls</span>
+      <span class="qex" onclick="quickAdd('Leg Press')">Leg Press</span>
+    </div>
+  </section>
+
+  <!-- ACTIVE SESSION -->
+  <section class="session-section" id="session-section" style="display:none">
+    <div class="session-header">
+      <h2 class="section-heading">Current Session</h2>
+      <div class="session-timer" id="session-clock">00:00</div>
+    </div>
+    <div id="exercise-list"></div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="history-section">
+    <h2 class="section-heading">📋 Past Sessions</h2>
+    <div id="history-list"></div>
+  </section>
+
+</main>
+
+<footer class="footer"><p>© 2026 <strong>Thawman AI Fitness</strong> — Workout Tracker 🏋️</p></footer>
+
+<script src="tracker.js"></script>
+</body>
+</html>

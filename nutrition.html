@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thawman Fitness — Nutrition Scanner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="nutrition.css">
+  <script src="api.js"></script>
+  <script>
+    window.addEventListener("backendSyncComplete", () => {
+      console.log("[Sync] Nutrition log updated. Reloading nutrition panel...");
+      window.location.reload();
+    });
+  </script>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="index.html" class="back-link">← Back to Dashboard</a>
+    <h1 class="nav-title">🍎 Nutrition Scanner</h1>
+    <div style="width:140px"></div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="scanner-hero">
+  <h2 class="hero-heading">Scan or Search Your Food</h2>
+  <p class="hero-sub">Upload a photo, use your camera, or type a food name to get the full nutritional breakdown instantly.</p>
+</section>
+
+<!-- INPUT SECTION -->
+<section class="input-section">
+  <div class="input-card">
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab active-tab" onclick="switchTab('search')" id="tab-search">🔍 Search</button>
+      <button class="tab" onclick="switchTab('camera')" id="tab-camera">📷 Camera</button>
+      <button class="tab" onclick="switchTab('upload')" id="tab-upload">📁 Upload</button>
+    </div>
+
+    <!-- SEARCH TAB -->
+    <div class="tab-content active-content" id="content-search">
+      <div class="search-box">
+        <input type="text" id="food-input" placeholder="e.g. chicken breast, rice, banana..." autocomplete="off" onkeydown="if(event.key==='Enter')searchFood()">
+        <button class="search-btn" onclick="searchFood()">Analyze</button>
+      </div>
+      <div class="quick-tags" id="quick-tags">
+        <span class="qtag" onclick="quickSearch('chicken breast')">Chicken Breast</span>
+        <span class="qtag" onclick="quickSearch('rice')">Rice</span>
+        <span class="qtag" onclick="quickSearch('egg')">Egg</span>
+        <span class="qtag" onclick="quickSearch('banana')">Banana</span>
+        <span class="qtag" onclick="quickSearch('oats')">Oats</span>
+        <span class="qtag" onclick="quickSearch('paneer')">Paneer</span>
+        <span class="qtag" onclick="quickSearch('milk')">Milk</span>
+        <span class="qtag" onclick="quickSearch('whey protein')">Whey Protein</span>
+        <!-- FILTER OPTIONS -->
+        <div class="filter-options" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+          <select id="budget-tier" style="padding:4px;">
+            <option value="" disabled selected>Monthly Budget Tier</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+          <select id="dietary-style" style="padding:4px;">
+            <option value="" disabled selected>Dietary Style</option>
+            <option value="vegan">Vegan</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="keto">Keto</option>
+            <option value="paleo">Paleo</option>
+            <option value="standard">Standard</option>
+          </select>
+          <select id="taste-profile" style="padding:4px;">
+            <option value="" disabled selected>Taste Profile</option>
+            <option value="sweet">Sweet</option>
+            <option value="savory">Savory</option>
+            <option value="spicy">Spicy</option>
+            <option value="umami">Umami</option>
+          </select>
+          <select id="active-vibe" style="padding:4px;">
+            <option value="" disabled selected>Active Vibe</option>
+            <option value="pre-workout">Pre‑Workout</option>
+            <option value="post-workout">Post‑Workout</option>
+            <option value="recovery">Recovery</option>
+            <option value="daily">Daily</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMERA TAB -->
+    <div class="tab-content" id="content-camera">
+      <div class="camera-area">
+        <video id="cam-video" autoplay playsinline></video>
+        <canvas id="cam-canvas" style="display:none"></canvas>
+        <div class="cam-overlay" id="cam-overlay">
+          <span>📷 Tap to start camera</span>
+        </div>
+      </div>
+      <div class="cam-actions">
+        <button class="cam-btn" onclick="startCamera()" id="btn-start-cam">Start Camera</button>
+        <button class="cam-btn capture-btn" onclick="capturePhoto()" id="btn-capture" style="display:none">📸 Capture</button>
+      </div>
+      <div id="cam-result" style="display:none">
+        <img id="captured-img" class="captured-preview">
+        <p class="cam-hint">Photo captured! Now type the food name below:</p>
+        <div class="search-box" style="margin-top:12px">
+          <input type="text" id="cam-food-input" placeholder="What food is this?" onkeydown="if(event.key==='Enter')searchFoodCam()">
+          <button class="search-btn" onclick="searchFoodCam()">Analyze</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPLOAD TAB -->
+    <div class="tab-content" id="content-upload">
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleUpload(event)">
+        <div class="upload-icon">📁</div>
+        <p class="upload-text">Click or drag & drop a food photo</p>
+        <p class="upload-hint">JPG, PNG — Max 10MB</p>
+      </div>
+      <div id="upload-result" style="display:none">
+        <img id="uploaded-img" class="captured-preview">
+        <p class="cam-hint">Photo uploaded! Now type the food name:</p>
+        <div class="search-box" style="margin-top:12px">
+          <input type="text" id="upload-food-input" placeholder="What food is this?" onkeydown="if(event.key==='Enter')searchFoodUpload()">
+          <button class="search-btn" onclick="searchFoodUpload()">Analyze</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- RESULTS SECTION -->
+<section class="results-section" id="results-section" style="display:none">
+
+  <div class="result-header">
+    <h2 class="result-food-name" id="result-name">—</h2>
+    <span class="result-serving" id="result-serving">per 100g serving</span>
+  </div>
+
+  <!-- MACRO RINGS -->
+  <div class="macro-rings" id="macro-rings">
+    <div class="ring-card">
+      <div class="ring" id="ring-cal"><svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill ring-fill-cal" cx="60" cy="60" r="52" id="ring-cal-fill"/></svg><div class="ring-val" id="ring-cal-val">0</div></div>
+      <span class="ring-label">Calories</span>
+    </div>
+    <div class="ring-card">
+      <div class="ring"><svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill ring-fill-protein" cx="60" cy="60" r="52" id="ring-protein-fill"/></svg><div class="ring-val" id="ring-protein-val">0g</div></div>
+      <span class="ring-label">Protein</span>
+    </div>
+    <div class="ring-card">
+      <div class="ring"><svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill ring-fill-carb" cx="60" cy="60" r="52" id="ring-carb-fill"/></svg><div class="ring-val" id="ring-carb-val">0g</div></div>
+      <span class="ring-label">Carbs</span>
+    </div>
+    <div class="ring-card">
+      <div class="ring"><svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill ring-fill-fat" cx="60" cy="60" r="52" id="ring-fat-fill"/></svg><div class="ring-val" id="ring-fat-val">0g</div></div>
+      <span class="ring-label">Fat</span>
+    </div>
+  </div>
+
+  <!-- DETAIL GRID -->
+  <div class="detail-grid" id="detail-grid"></div>
+
+  <!-- VITAMINS & MINERALS -->
+  <div class="vitamins-section">
+    <h3 class="vitamins-title">Vitamins & Minerals</h3>
+    <div class="vitamins-grid" id="vitamins-grid"></div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict-card" id="verdict-card"></div>
+
+</section>
+
+<!-- FOOD LOG -->
+<section class="log-section" id="log-section">
+  <h3 class="log-title">📋 Today's Food Log</h3>
+  <div id="food-log"></div>
+  <div class="log-totals" id="log-totals" style="display:none">
+    <span id="total-cal">0 kcal</span> •
+    <span id="total-protein">0g protein</span> •
+    <span id="total-carbs">0g carbs</span> •
+    <span id="total-fat">0g fat</span>
+  </div>
+  <button class="set-goals-btn" onclick="renderRemaining()" style="margin-top:8px; background:#4ade80; color:white; padding:6px 12px; border:none; border-radius:4px; cursor:pointer;">Set Daily Goals</button>
+  <div id="remaining-totals" style="display:none">
+    <span id="remain-cal"></span> •
+    <span id="remain-protein"></span> •
+    <span id="remain-carbs"></span> •
+    <span id="remain-fat"></span>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>© 2026 <strong>Thawman AI Fitness</strong> — Nutrition Scanner 🍎</p>
+</footer>
+
+<script src="nutrition.js"></script>
+</body>
+</html>

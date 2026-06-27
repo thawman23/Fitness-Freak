@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thawman AI Fitness — Posture Camera Trainer</title>
+  
+  <!-- Font and Stylesheets -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="pose.css">
+  <script src="api.js"></script>
+
+  <!-- MediaPipe Pose Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- BACKGROUND ORBS -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <!-- NAVIGATION BAR -->
+  <nav class="nav-bar">
+    <div class="nav-inner">
+      <a href="index.html" class="back-link">← Dashboard</a>
+      <h1 class="nav-title">🤖 AI Posture Trainer</h1>
+      <div class="session-timer-badge" id="session-badge">
+        <span class="timer-pulse"></span>
+        <span id="session-clock">00:00</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="app-container">
+
+    <!-- LEFT COLUMN: SIDEBAR CONTROLS -->
+    <div class="sidebar">
+
+      <!-- EXERCISE SELECTOR -->
+      <section class="glass-card">
+        <h2 class="card-title">🎯 Select Exercise</h2>
+        <div class="exercise-grid">
+          <div class="ex-option-card active" onclick="selectExercise('auto')" id="ex-auto">
+            <span class="ex-icon">🤖</span>
+            <div class="ex-info">
+              <span class="ex-name">Auto-Detect</span>
+              <span class="ex-desc">AI automatically detects your movement</span>
+            </div>
+          </div>
+          <div class="ex-option-card" onclick="selectExercise('curls')" id="ex-curls">
+            <span class="ex-icon">💪</span>
+            <div class="ex-info">
+              <span class="ex-name">Bicep Curls</span>
+              <span class="ex-desc">Tracks left/right elbow angle & drift</span>
+            </div>
+          </div>
+          <div class="ex-option-card" onclick="selectExercise('squats')" id="ex-squats">
+            <span class="ex-icon">🏋️</span>
+            <div class="ex-info">
+              <span class="ex-name">Squats</span>
+              <span class="ex-desc">Tracks knee parallel depth & trunk tilt</span>
+            </div>
+          </div>
+          <div class="ex-option-card" onclick="selectExercise('pushups')" id="ex-pushups">
+            <span class="ex-icon">🤸</span>
+            <div class="ex-info">
+              <span class="ex-name">Pushups</span>
+              <span class="ex-desc">Tracks elbow flexion & hip sagittal alignment</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- REP COUNTER CARD -->
+      <section class="glass-card rep-counter-container">
+        <div class="rep-ring">
+          <svg viewBox="0 0 140 140">
+            <circle class="ring-track" cx="70" cy="70" r="65"/>
+            <circle class="ring-fill" cx="70" cy="70" r="65" id="rep-ring-fill"/>
+          </svg>
+          <div class="rep-count-text">
+            <div class="rep-num" id="rep-count">0</div>
+            <div class="rep-label">Reps</div>
+          </div>
+        </div>
+
+        <div class="rep-metrics">
+          <div class="metric-pill">
+            <div class="metric-val text-glow" id="form-score-percentage">100%</div>
+            <div class="metric-lbl">Form Score</div>
+          </div>
+          <div class="metric-pill">
+            <div class="metric-val" id="calories-burned">0</div>
+            <div class="metric-lbl">Est. kcal</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FORM FEEDBACK CHECKLIST -->
+      <section class="glass-card">
+        <h2 class="card-title">🔍 Form Checklist</h2>
+        <ul class="checklist" id="feedback-checklist">
+          <!-- Dynamic Checklist items injected here -->
+        </ul>
+      </section>
+
+      <!-- VOICE & AUDIO CONTROLS -->
+      <section class="glass-card">
+        <h2 class="card-title">⚙️ Audio Assistant</h2>
+        <div class="toggles-list">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-title">AI Voice Coach</span>
+              <span class="toggle-desc">Speaks posture advice in real-time</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-voice" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-title">Rep Complete Sound</span>
+              <span class="toggle-desc">Plays a sound when rep is counted</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-sfx" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT COLUMN: WEBCAM VIEWPORT & CONTROLS -->
+    <div class="camera-container">
+
+      <div class="viewports-container">
+        <!-- USER CAMERA VIEWPORT -->
+        <div class="camera-viewport">
+
+          <!-- SETUP OVERLAY (permissions and model loading) -->
+          <div class="setup-overlay" id="setup-panel">
+            <div class="setup-icon" id="setup-emoji">🎥</div>
+            <h2 class="modal-title" id="setup-title">Setup AI Posture Camera</h2>
+            <p class="setup-desc" id="setup-desc">Allow webcam access to track your exercises. All posture processing happens safely on your device in the browser.</p>
+            <button class="setup-btn" onclick="initializeCamera()" id="setup-btn">Start Session</button>
+          </div>
+
+          <!-- COACHING FEEDBACK FLOATER -->
+          <div class="coach-feedback-banner alert" id="feedback-banner">
+            <span class="feedback-icon" id="fb-icon">⚠️</span>
+            <span class="feedback-text" id="fb-text">Keep elbows tucked!</span>
+          </div>
+
+          <!-- RAW HIDDEN VIDEO -->
+          <video id="raw-video" autoplay playsinline muted></video>
+
+          <!-- DRAWING OVERLAY CANVAS -->
+          <canvas id="canvas-overlay"></canvas>
+
+        </div>
+
+        <!-- AI COACH VIEWPORT -->
+        <div class="coach-viewport glass-card">
+          <div class="coach-header">
+            <div class="coach-avatar-container">
+              <img src="cbum.jpg" class="coach-avatar" alt="CBum AI Trainer">
+              <span class="coach-pulse-dot"></span>
+            </div>
+            <div class="coach-meta">
+              <h3 class="coach-title">CBum AI Coach Companion</h3>
+              <span class="coach-status" id="coach-status">Awaiting camera start...</span>
+            </div>
+          </div>
+          <div class="coach-canvas-container">
+            <canvas id="coach-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOWER CONTROLS BAR -->
+      <div class="camera-controls-bar">
+        <button class="session-btn btn-pause" onclick="togglePause()" id="pause-btn" style="display:none">
+          <span>⏸</span> Pause Session
+        </button>
+        <button class="session-btn btn-finish" onclick="finishSession()" id="finish-btn" style="display:none">
+          <span>✅</span> Finish Session
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- WORKOUT COMPLETE SUMMARY MODAL -->
+  <div class="modal-overlay" id="summary-modal">
+    <div class="modal-card">
+      <div class="modal-emoji">🏆</div>
+      <h2 class="modal-title">Workout Completed!</h2>
+      <p class="modal-subtitle">Great job! Here is your AI Posture breakdown:</p>
+      
+      <div class="summary-grid">
+        <div class="summary-cell">
+          <div class="summary-val" id="sum-exercise">—</div>
+          <div class="summary-lbl">Exercise</div>
+        </div>
+        <div class="summary-cell">
+          <div class="summary-val purple" id="sum-reps">0</div>
+          <div class="summary-lbl">Reps Completed</div>
+        </div>
+        <div class="summary-cell">
+          <div class="summary-val" id="sum-accuracy">100%</div>
+          <div class="summary-lbl">Avg Form Score</div>
+        </div>
+        <div class="summary-cell">
+          <div class="summary-val purple" id="sum-calories">0 kcal</div>
+          <div class="summary-lbl">Est. Calories Burned</div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn btn-discard" onclick="discardSession()">Discard</button>
+        <button class="modal-btn btn-save" onclick="saveSession()">Save to Dashboard</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="pose.js"></script>
+</body>
+</html>

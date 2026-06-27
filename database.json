@@ -1,0 +1,93 @@
+{
+  "users": {
+    "thaw": {
+      "password": "thaw",
+      "userData": {
+        "gender": "female",
+        "name": "",
+        "age": "",
+        "weight": "",
+        "goal": "gain",
+        "body": "fit",
+        "split": "ppl"
+      },
+      "workoutHistory": [
+        {
+          "date": "Wed, May 20, 2026",
+          "time": "02:06 PM",
+          "duration": "45m 00s",
+          "exercises": [
+            {
+              "name": "Barbell Bench Press",
+              "sets": "4/4",
+              "reps": 6,
+              "weight": 0
+            },
+            {
+              "name": "Overhead Press",
+              "sets": "3/3",
+              "reps": 8,
+              "weight": 0
+            },
+            {
+              "name": "Incline DB Press",
+              "sets": "3/3",
+              "reps": 10,
+              "weight": 0
+            },
+            {
+              "name": "Lateral Raises",
+              "sets": "3/3",
+              "reps": 12,
+              "weight": 0
+            },
+            {
+              "name": "Tricep Rope Pushdowns",
+              "sets": "3/3",
+              "reps": 10,
+              "weight": 0
+            }
+          ],
+          "totalSets": 15,
+          "totalVolume": 0
+        }
+      ],
+      "foodLog_today": [
+        {
+          "name": "egg",
+          "cal": 155,
+          "protein": 13,
+          "carbs": 1.1,
+          "fat": 11
+        },
+        {
+          "name": "egg",
+          "cal": 155,
+          "protein": 13,
+          "carbs": 1.1,
+          "fat": 11
+        },
+        {
+          "name": "egg",
+          "cal": 155,
+          "protein": 13,
+          "carbs": 1.1,
+          "fat": 11
+        },
+        {
+          "name": "banana",
+          "cal": 89,
+          "protein": 1.1,
+          "carbs": 23,
+          "fat": 0.3
+        }
+      ],
+      "foodLog_date": "Wed May 20 2026",
+      "streakData": {
+        "daysLogged": [],
+        "currentStreak": 0,
+        "lastActiveDate": ""
+      }
+    }
+  }
+}

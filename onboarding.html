@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Onboarding</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="api.js"></script>
+
+  <style>
+    body {
+      margin: 0;     
+      font-family: sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    /* BACKGROUND STRIP */
+    .bg-strip {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      display: flex;
+      z-index: -10;
+      animation: scrollStrip 25s linear infinite;
+    }
+
+    .bg-strip img {
+      width: 16.6%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.18;
+    }
+
+    @keyframes scrollStrip {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* CLEAN OVERLAY */
+    .overlay {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.75);
+      z-index: -9;
+    }
+
+    .glass {
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(63, 7, 217, 0.5);
+    }
+
+    .step {
+      display: none;
+      animation: fade 0.4s ease;
+    }
+
+    .active-step {
+      display: block;
+    }
+
+    @keyframes fade {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #4ade80, #c026d3);
+    }
+
+    .option {
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .option:hover {
+      transform: scale(1.05);
+    }
+
+    img.opt-img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-strip">
+  <img src="arnold.jpg">
+  <img src="ronnie.jpg">
+  <img src="cbum.jpg">
+  <img src="iris.jpg">
+  <img src="dana.jpg">
+  <img src="pragathi.jpg">
+
+  <img src="arnold.jpg">
+  <img src="ronnie.jpg">
+  <img src="cbum.jpg">
+  <img src="iris.jpg">
+  <img src="dana.jpg">
+  <img src="pragathi.jpg">
+</div>
+
+<div class="overlay"></div>
+
+<!-- CENTER -->
+<div class="flex items-center justify-center h-screen">
+
+  <div class="glass p-8 rounded-xl w-[420px] text-center">
+
+    <!-- STEP 0 GENDER -->
+    <div class="step active-step">
+      <h2 class="text-2xl mb-4">Select Gender</h2>
+
+      <div class="grid grid-cols-2 gap-4">
+
+        <div class="glass p-3 rounded option" onclick="selectGender('male')">
+          <img class="opt-img" src="male.png">
+          👨 Male
+        </div>
+
+        <div class="glass p-3 rounded option" onclick="selectGender('female')">
+          <img class="opt-img" src="female.png">
+          👩 Female
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <h2 class="text-2xl mb-4">What's your name?</h2>
+      <input id="name" class="w-full p-3 rounded bg-black/40">
+      <button class="btn mt-4 w-full py-2 rounded" onclick="nextStep()">Next</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <h2 class="text-2xl mb-4">Age</h2>
+      <input id="age" type="number" class="w-full p-3 rounded bg-black/40">
+      <button class="btn mt-4 w-full py-2 rounded" onclick="nextStep()">Next</button>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <h2 class="text-2xl mb-4">Current Weight (kg)</h2>
+      <input id="weight" type="number" class="w-full p-3 rounded bg-black/40">
+      <button class="btn mt-4 w-full py-2 rounded" onclick="nextStep()">Next</button>
+    </div>
+
+    <!-- STEP 4: TARGET WEIGHT -->
+    <div class="step">
+      <h2 class="text-2xl mb-4">Target Weight Goal (kg)</h2>
+      <input id="targetWeight" type="number" class="w-full p-3 rounded bg-black/40">
+      <button class="btn mt-4 w-full py-2 rounded" onclick="nextStep()">Next</button>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <h2 class="text-2xl mb-4">Your Goal</h2>
+
+      <div class="grid grid-cols-2 gap-3">
+
+        <div class="glass p-3 rounded option" onclick="selectGoal('lose')">
+          <img id="goal-lose-img" class="opt-img" src="lose_male.jpg">
+          🔥 Lose Weight
+        </div>
+
+        <div class="glass p-3 rounded option" onclick="selectGoal('gain')">
+          <img id="goal-gain-img" class="opt-img" src="gain_male.png">
+          💪 Gain Muscle
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step">
+      <h2 class="text-2xl mb-4">Body Type</h2>
+
+      <div class="grid grid-cols-2 gap-3">
+
+        <div class="glass p-3 rounded option" onclick="selectBody('muscular')">
+          <img id="body-muscular-img" class="opt-img" src="muscular_male.png">
+          🏋️ Muscular
+        </div>
+
+        <div class="glass p-3 rounded option" onclick="selectBody('fit')">
+          <img id="body-fit-img" class="opt-img" src="lean_male.png">
+          🧘 Lean Fit
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STEP 6: WORKOUT SPLIT -->
+    <div class="step">
+      <h2 class="text-2xl mb-4">Choose Workout Split</h2>
+      <p class="text-gray-400 text-sm mb-4">Pick the training style you prefer</p>
+
+      <div class="grid grid-cols-1 gap-3">
+
+        <div class="glass p-4 rounded option flex items-center gap-3" onclick="selectSplit('bro')">
+          <span class="text-2xl">💥</span>
+          <div class="text-left">
+            <div class="font-bold">Bro Split</div>
+            <div class="text-xs text-gray-400">Chest • Back • Shoulders • Arms • Legs • Abs</div>
+          </div>
+        </div>
+
+        <div class="glass p-4 rounded option flex items-center gap-3" onclick="selectSplit('ppl')">
+          <span class="text-2xl">🔄</span>
+          <div class="text-left">
+            <div class="font-bold">Push / Pull / Legs</div>
+            <div class="text-xs text-gray-400">Push • Pull • Legs • Push • Pull • Legs</div>
+          </div>
+        </div>
+
+        <div class="glass p-4 rounded option flex items-center gap-3" onclick="selectSplit('ul')">
+          <span class="text-2xl">⚡</span>
+          <div class="text-left">
+            <div class="font-bold">Upper / Lower</div>
+            <div class="text-xs text-gray-400">Upper • Lower • Upper • Lower • Full Body • Rest</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STEP 7: READY -->
+    <div class="step">
+      <h2 class="text-2xl mb-4">You're Ready 🚀</h2>
+      <p class="text-gray-400 text-sm mb-4" id="summary-text"></p>
+      <button class="btn w-full py-3 rounded" onclick="finish()">Enter Home</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+let step = 0;
+let steps = document.querySelectorAll(".step");
+
+let data = {
+  gender: "",
+  name: "",
+  age: "",
+  weight: "",
+  targetWeight: "",
+  goal: "",
+  body: "",
+  split: ""
+};
+
+function showStep(i) {
+  steps.forEach(s => s.classList.remove("active-step"));
+  steps[i].classList.add("active-step");
+}
+
+/* GENDER */
+function selectGender(val) {
+  data.gender = val;
+  
+  if (val === 'male') {
+    document.getElementById('goal-lose-img').src = 'lose_male.jpg';
+    document.getElementById('goal-gain-img').src = 'gain_male.png';
+    document.getElementById('body-muscular-img').src = 'muscular_male.png';
+    document.getElementById('body-fit-img').src = 'lean_male.png';
+  } else {
+    document.getElementById('goal-lose-img').src = 'lose_female.png';
+    document.getElementById('goal-gain-img').src = 'gain_female.png';
+    document.getElementById('body-muscular-img').src = 'muscular_female.png';
+    document.getElementById('body-fit-img').src = 'lean_female.png';
+  }
+
+  step++;
+  showStep(step);
+}
+
+/* NEXT INPUT STEPS */
+function nextStep() {
+  if (step === 1) data.name = document.getElementById("name").value;
+  if (step === 2) data.age = document.getElementById("age").value;
+  if (step === 3) data.weight = document.getElementById("weight").value;
+  if (step === 4) data.targetWeight = document.getElementById("targetWeight").value;
+
+  step++;
+  showStep(step);
+}
+
+/* GOAL */
+function selectGoal(val) {
+  data.goal = val;
+  step++;
+  showStep(step);
+}
+
+/* BODY TYPE */
+function selectBody(val) {
+  data.body = val;
+  step++;
+  showStep(step);
+}
+
+/* WORKOUT SPLIT */
+function selectSplit(val) {
+  data.split = val;
+  // Show summary before finish
+  const splitNames = { bro: 'Bro Split', ppl: 'Push/Pull/Legs', ul: 'Upper/Lower' };
+  const goalNames = { gain: 'Gain Muscle', lose: 'Lose Weight' };
+  const bodyNames = { muscular: 'Muscular', fit: 'Lean Fit' };
+  document.getElementById('summary-text').textContent =
+    `${data.name} • ${data.age}y • Current: ${data.weight}kg • Target: ${data.targetWeight}kg • ${goalNames[data.goal]} • ${bodyNames[data.body]} • ${splitNames[val]}`;
+  step++;
+  showStep(step);
+}
+
+/* FINISH */
+function finish() {
+  // Store user profile data
+  localStorage.setItem("userData", JSON.stringify(data));
+  localStorage.setItem("user", data.name);
+  // Set the logged-in user identifier (using name as key)
+  if (data.name) {
+    localStorage.setItem("user", data.name);
+  }
+  // Redirect to home page
+  window.location.href = "index.html";
+}
+
+</script>
+
+</body>
+</html>
